@@ -2,6 +2,8 @@
 
 A SlackBot to let you know what is up for pret-a-diner tonight!
 
+![screenshot of the bot in action for the first time](screenshot.png)
+
 requires:
 
 - sogeres (sohappy@work account)
