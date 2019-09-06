@@ -29,9 +29,12 @@ def main():
                                   'JSESSIONID': '933B6AAFCA056FBA03FDCF4835140620.Helium_instance_2',
                               })
     soup_logout = make_soup(res_logout)
-    print("Logout: ", soup_logout.find("div", {"class": "menu-contextual-link"}))
-    # print("Logout   : ", soup_logout.prettify())
-    exit(-1)
+    text = soup_logout.find("h1", {"class": "h2"}).get_text()
+    if "Connectez-vous" in text:
+        print("Logout successful.")
+    else:
+        print("Failed to logout!?")
+        exit(-1)
 
     # Login
     res_login = requests.post('https://55-amsterdam.sohappy.work/',
@@ -51,6 +54,7 @@ def main():
                                   'isStayConnected': ''
                               })
     print(res_login.content)
+    exit(0)
 
     # Get menu
     res = requests.get(url_pret_a_diner, cookies={
