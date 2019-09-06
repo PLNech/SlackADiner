@@ -10,7 +10,7 @@ url_menu = "https://55-amsterdam.sohappy.work/?e=zro.cr&crid=3&id=1968"
 
 
 def main():
-    print(get_meals())
+    print("Meal:", get_meal())
 
 
 def get_meals():
@@ -26,6 +26,10 @@ def get_meals():
                         soup_diner.find_all("div", {"class": "product-box-content"})]
         meals = [(m, translator.translate(m).text) for m in meals_french]
     return meals
+
+
+def get_meal():
+    return get_meals()[0]
 
 
 def start_new_command(session):
