@@ -7,13 +7,15 @@ client = slack.WebClient(
 )
 
 
-def format_text(fr, en):
+def format_text(fr, en, number):
     return """
 Hi everyone :sir:
 
 Today you can eat *{en}* (_{fr}_ :cow:)
+
+There is {number} left, hurry!
 """.format(
-        fr=fr, en=en
+        fr=fr, en=en, number=number
     )
 
 
