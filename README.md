@@ -8,6 +8,7 @@ requires:
 
 - sogeres (sohappy@work account)
 - slackbot API token (SLACK_API_TOKEN environment variable)
+- SLACK_CHANNEL environment variable
 - having pret-a-diner at your company's cantine
 - python3
 - set up Heroku scheduling for when the menu will be available

@@ -37,7 +37,7 @@ There is {number} left, hurry!
 def send():
     text, attachments = make_message(*get_meal())
     response = client.chat_postMessage(
-        channel="#test",
+        channel=os.environ['SLACK_CHANNEL'],
         # channel="#office-paris-lunch",
         text=text,
         attachments=attachments,
