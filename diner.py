@@ -1,8 +1,9 @@
 import googletrans
 import requests
 from bs4 import BeautifulSoup
+from datetime import date
 
-str_date = "06-09-2019"  # TODO: Dynamic
+str_date = date.today().strftime("%d-%m-%Y")
 url_base = "https://55-amsterdam.sohappy.work/?id=1968"
 url_new_order_get = url_base + "&e=zr"
 url_new_order_post = url_base + "&e=zro"
