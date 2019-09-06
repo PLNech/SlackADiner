@@ -3,10 +3,11 @@ import requests
 from bs4 import BeautifulSoup
 
 str_date = "06-09-2019"  # TODO: Dynamic
-url_new_order_get = "https://55-amsterdam.sohappy.work/?e=zr&id=1968"
-url_new_order_post = "https://55-amsterdam.sohappy.work/?e=zro&id=1968"
-url_start_order = "https://55-amsterdam.sohappy.work/?e=zro.start&d=%s&id=1968" % str_date
-url_menu = "https://55-amsterdam.sohappy.work/?e=zro.cr&crid=3&id=1968"
+url_base = "https://55-amsterdam.sohappy.work/?id=1968"
+url_new_order_get = url_base + "&e=zr"
+url_new_order_post = url_base + "&e=zro"
+url_start_order = url_base + "&e=zro.start&d=%s" % str_date
+url_menu = url_base + "&e=zro.cr&crid=3"
 
 
 def main():
@@ -15,6 +16,7 @@ def main():
 
 def get_meals():
     translator = googletrans.Translator()
+
     with requests.Session() as session:
         reset_session(session)
         start_new_command(session)
@@ -22,8 +24,8 @@ def get_meals():
         res = session.get(url_menu)  # Get menu
         soup_diner = make_soup(res)
 
-        meals_french = [meal.get_text().strip() for meal in
-                        soup_diner.find_all("div", {"class": "product-box-content"})]
+        meal_divs = soup_diner.find_all(attrs={"class": "product-box-content"})
+        meals_french = [meal.get_text().strip() for meal in meal_divs]
         meals = [(m, translator.translate(m).text) for m in meals_french]
     return meals
 
@@ -56,13 +58,7 @@ def logout(session):
                                   'Connection': 'keep-alive',
                                   'Upgrade-Insecure-Requests': '1',
                               },
-                              params=(('e', 'user.logout'),),
-                              cookies={
-                                  'ICMD': '1',
-                                  'CFID': '13969531',
-                                  'CFTOKEN': 'e8e07c262782e019-DFE03B46-E9C4-D226-59262876C18EDFB1',
-                                  'JSESSIONID': '933B6AAFCA056FBA03FDCF4835140620.Helium_instance_2',
-                              })
+                              params=(('e', 'user.logout'),), )
     soup_logout = make_soup(res_logout)
     text = soup_logout.find("h1", {"class": "h2"}).get_text()
     if "Connectez-vous" in text:
