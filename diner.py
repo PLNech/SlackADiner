@@ -1,3 +1,4 @@
+import googletrans
 import requests
 from bs4 import BeautifulSoup
 
@@ -13,6 +14,7 @@ def main():
 
 
 def get_meals():
+    translator = googletrans.Translator()
     with requests.Session() as session:
         reset_session(session)
         start_new_command(session)
@@ -20,7 +22,9 @@ def get_meals():
         res = session.get(url_menu)  # Get menu
         soup_diner = make_soup(res)
 
-        meals = [meal.get_text().strip() for meal in soup_diner.find_all("div", {"class": "product-box-content"})]
+        meals_french = [meal.get_text().strip() for meal in
+                        soup_diner.find_all("div", {"class": "product-box-content"})]
+        meals = [(m, translator.translate(m).text) for m in meals_french]
     return meals
 
 
