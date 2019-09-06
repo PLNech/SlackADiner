@@ -1,4 +1,4 @@
-requests
-googletranslate
-bs4
-slackclient
+beautifulsoup4==4.8.0
+googletrans==2.4.0
+requests==2.22.0
+slackclient==2.1.0
