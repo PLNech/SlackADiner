@@ -16,6 +16,8 @@ def main():
 
 
 def get_meal():
+    # TODO: find spelling suggestion if this URL continues to work in the future:
+    # https://translate.google.com/translate_a/single?client=webapp&sl=fr&dt=qca&tk=543930.977311&q=calamars%20sautes%20au%20curry%20et%20a%20l%27ail
     translator = googletrans.Translator()
     with requests.Session() as session:
         reset_session(session)
