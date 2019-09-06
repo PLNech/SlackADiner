@@ -1,0 +1,4 @@
+requests
+googletranslate
+bs4
+slackclient
