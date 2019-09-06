@@ -14,9 +14,8 @@ def main():
     print("Meal:", get_meal())
 
 
-def get_meals():
+def get_meal():
     translator = googletrans.Translator()
-
     with requests.Session() as session:
         reset_session(session)
         start_new_command(session)
@@ -24,14 +23,10 @@ def get_meals():
         res = session.get(url_menu)  # Get menu
         soup_diner = make_soup(res)
 
-        meal_divs = soup_diner.find_all(attrs={"class": "product-box-content"})
-        meals_french = [meal.get_text().strip() for meal in meal_divs]
-        meals = [(m, translator.translate(m).text) for m in meals_french]
-    return meals
-
-
-def get_meal():
-    return get_meals()[0]
+        meal_diner_select = soup_diner.find("select", {"class": "js-item-quantity"})
+        meal_diner_div = meal_diner_select.parent.parent.parent
+        meal_diner = meal_diner_div.find("h3").get_text().strip()
+    return meal_diner, translator.translate(meal_diner).text
 
 
 def start_new_command(session):
@@ -60,8 +55,7 @@ def logout(session):
                               },
                               params=(('e', 'user.logout'),), )
     soup_logout = make_soup(res_logout)
-    text = soup_logout.find("h1", {"class": "h2"}).get_text()
-    if "Connectez-vous" in text:
+    if "Connectez-vous" in soup_logout.find("h1", {"class": "h2"}).get_text():
         print("Logout successful.")
     else:
         print("Failed to logout!?")
