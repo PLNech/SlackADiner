@@ -24,9 +24,10 @@ def get_meal():
         soup_diner = make_soup(res)
 
         meal_diner_select = soup_diner.find("select", {"class": "js-item-quantity"})
+        quantity = int(meal_diner_select.find_all("option")[-1].get_text())
         meal_diner_div = meal_diner_select.parent.parent.parent
         meal_diner = meal_diner_div.find("h3").get_text().strip()
-    return meal_diner, translator.translate(meal_diner).text
+    return meal_diner, translator.translate(meal_diner).text, quantity
 
 
 def start_new_command(session):
