@@ -1,7 +1,8 @@
+from datetime import date
+
 import googletrans
 import requests
 from bs4 import BeautifulSoup
-from datetime import date
 
 str_date = date.today().strftime("%d-%m-%Y")
 url_base = "https://55-amsterdam.sohappy.work/?id=1968"
@@ -12,13 +13,16 @@ url_menu = url_base + "&e=zro.cr&crid=3"
 
 
 def main():
-    print("Meal:", get_meal())
+    print("Meals:", get_meals())
 
 
-def get_meal():
+def get_meals():
     # TODO: find spelling suggestion if this URL continues to work in the future:
     # https://translate.google.com/translate_a/single?client=webapp&sl=fr&dt=qca&tk=543930.977311&q=calamars%20sautes%20au%20curry%20et%20a%20l%27ail
+
+    meals = []
     translator = googletrans.Translator()
+
     with requests.Session() as session:
         reset_session(session)
         start_new_command(session)
@@ -26,11 +30,14 @@ def get_meal():
         res = session.get(url_menu)  # Get menu
         soup_diner = make_soup(res)
 
-        meal_diner_select = soup_diner.find("select", {"class": "js-item-quantity"})
-        quantity = int(meal_diner_select.find_all("option")[-1].get_text())
-        meal_diner_div = meal_diner_select.parent.parent.parent
-        meal_diner = meal_diner_div.find("h3").get_text().strip()
-    return meal_diner, translator.translate(meal_diner).text, quantity
+        meal_diner_selects = soup_diner.find_all("select", {"class": "js-item-quantity"})
+
+        for meal_select in meal_diner_selects:
+            quantity = int(meal_select.find_all("option")[-1].get_text())
+            meal_diner_div = meal_select.parent.parent.parent
+            meal_diner = meal_diner_div.find("h3").get_text().strip()
+            meals.append((meal_diner, translator.translate(meal_diner).text, quantity))
+    return meals
 
 
 def start_new_command(session):

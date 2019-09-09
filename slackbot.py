@@ -1,22 +1,23 @@
 import os
+
 import slack
-from diner import get_meal
+
+from diner import get_meals
 
 client = slack.WebClient(
     token=os.environ["SLACK_API_TOKEN"]
 )
 
 
-def make_message(fr, en, number):
-    text = """
-Hi everyone :sir:
+def format_meal(fr, en, number):
+    return """• *{en}* (_{fr}_ :cow:)
+There is {number} left, hurry!""".format(fr=fr, en=en, number=number)
 
-Today you can eat *{en}* (_{fr}_ :cow:)
 
-There is {number} left, hurry!
-""".format(
-        fr=fr, en=en, number=number
-    )
+def make_message(meals):
+    header = "Hi everyone :sir:\nToday you can eat:\n\n"
+
+    text = header + "\n".join([format_meal(*m) for m in meals])
 
     attachments = [
         {
@@ -35,7 +36,7 @@ There is {number} left, hurry!
 
 
 def send():
-    text, attachments = make_message(*get_meal())
+    text, attachments = make_message(get_meals())
     response = client.chat_postMessage(
         channel=os.environ['SLACK_CHANNEL'],
         # channel="#office-paris-lunch",
@@ -45,15 +46,17 @@ def send():
     print("message sent!")
     return response
 
+
 def update(channel_id, ts):
     text, attachments = make_message(*get_meal())
-    response = client.chat_update(
+    client.chat_update(
         channel=channel_id,
         ts=ts,
         text=text,
         attachments=attachments,
     )
 
+
 if __name__ == "__main__":
     response = send()
-    print(response) # this contains channel & ts, used for updating
+    print(response)  # this contains channel & ts, used for updating
