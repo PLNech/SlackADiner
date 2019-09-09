@@ -10,8 +10,9 @@ client = slack.WebClient(
 
 
 def format_meal(fr, en, number):
+    number_str = str(number) if number > 2 else "*only one*"
     return """• *{en}* (_{fr}_ :cow:)
-There is {number} left, hurry!""".format(fr=fr, en=en, number=number)
+There is {number} left, hurry!""".format(fr=fr, en=en, number=number_str)
 
 
 def make_message(meals):
