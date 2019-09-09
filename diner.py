@@ -1,3 +1,4 @@
+import os
 from datetime import date
 
 import googletrans
@@ -10,6 +11,9 @@ url_new_order_get = url_base + "&e=zr"
 url_new_order_post = url_base + "&e=zro"
 url_start_order = url_base + "&e=zro.start&d=%s" % str_date
 url_menu = url_base + "&e=zro.cr&crid=3"
+
+username = os.environ["SOHAPPY_USERNAME"]
+password = os.environ["SOHAPPY_PASSWORD"]
 
 
 def main():
@@ -86,12 +90,13 @@ def login(session):
                              },
                              params=(('e', 'main.connect'),),
                              data={
-                                 'loginOrMail': 'pln+bot@algolia.com',
-                                 'pwd': 'free4bot@SH',
+                                 'loginOrMail': username,
+                                 'pwd': password,
                                  'isStayConnected': ''
                              })
     soup_login = make_soup(res_login)
-    text = soup_login.find("div", {"class": "header-account-menu"}).find("span", {"class": "picto-label"}).get_text()
+    text = soup_login.find("div", {"class": "header-account-menu"}).find("span",
+                                                                         {"class": "picto-label"}).get_text()
     if "Déconnexion" in text:
         print("Login successful.")
     else:

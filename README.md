@@ -4,14 +4,15 @@ A SlackBot to let you know what is up for pret-a-diner tonight!
 
 ![screenshot of the bot in action for the first time](screenshot.png)
 
-requires:
+## Requirements:
 
-- sogeres (sohappy@work account)
-- slackbot API token (SLACK_API_TOKEN environment variable)
-- SLACK_CHANNEL environment variable
-- having pret-a-diner at your company's cantine
+- having prêt-à-diner at your company's canteen
+- setting environment variables for credentials and parameters:
+  - Sogeres (sohappy@work account) credentials (`SOHAPPY_USERNAME` and `SOHAPPY_PASSWORD`)
+  - SlackBot API token (`SLACK_API_TOKEN`)
+  - Slack channel to post into (`SLACK_CHANNEL`)
 - python3
-- set up Heroku scheduling for when the menu will be available
+- set up Heroku scheduling for when the menu will be available (around 2.30, 3PM should be safe)
 
 ## Plans
 
