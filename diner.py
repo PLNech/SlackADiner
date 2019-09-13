@@ -1,9 +1,12 @@
+#! /usr/bin/env python
+
 import os
 from datetime import date
 
 import googletrans
 import requests
 from bs4 import BeautifulSoup
+from didyoumean3.didyoumean import did_you_mean
 
 str_date = date.today().strftime("%d-%m-%Y")
 url_base = "https://55-amsterdam.sohappy.work/?id=1968"
@@ -21,9 +24,6 @@ def main():
 
 
 def get_meals():
-    # TODO: find spelling suggestion if this URL continues to work in the future:
-    # https://translate.google.com/translate_a/single?client=webapp&sl=fr&dt=qca&tk=543930.977311&q=calamars%20sautes%20au%20curry%20et%20a%20l%27ail
-
     meals = []
     translator = googletrans.Translator()
 
@@ -40,6 +40,10 @@ def get_meals():
             quantity = int(meal_select.find_all("option")[-1].get_text())
             meal_diner_div = meal_select.parent.parent.parent
             meal_diner = meal_diner_div.find("h3").get_text().strip()
+            spellcheck = did_you_mean(meal_diner)
+            if spellcheck.lower() != meal_diner.lower():
+                meal_diner = spellcheck
+            print("Found available meal:", meal_diner)
             meals.append((meal_diner, translator.translate(meal_diner).text, quantity))
     return meals
 
