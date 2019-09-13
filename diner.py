@@ -63,15 +63,6 @@ def reset_session(session):
 
 def logout(session):
     res_logout = session.post('https://55-amsterdam.sohappy.work/',
-                              headers={
-                                  'User-Agent': 'SlackADiner Bot',
-                                  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                                  'Accept-Language': 'en-US,en;q=0.5',
-                                  'Referer': 'https://55-amsterdam.sohappy.work/',
-                                  'Content-Type': 'application/x-www-form-urlencoded',
-                                  'Connection': 'keep-alive',
-                                  'Upgrade-Insecure-Requests': '1',
-                              },
                               params=(('e', 'user.logout'),), )
     soup_logout = make_soup(res_logout)
     if "Connectez-vous" in soup_logout.find("h1", {"class": "h2"}).get_text():
@@ -83,15 +74,6 @@ def logout(session):
 
 def login(session):
     res_login = session.post('https://55-amsterdam.sohappy.work/',
-                             headers={
-                                 'User-Agent': 'SlackADiner Bot',
-                                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                                 'Accept-Language': 'en-US,en;q=0.5',
-                                 'Referer': 'https://55-amsterdam.sohappy.work/',
-                                 'Content-Type': 'application/x-www-form-urlencoded',
-                                 'Connection': 'keep-alive',
-                                 'Upgrade-Insecure-Requests': '1',
-                             },
                              params=(('e', 'main.connect'),),
                              data={
                                  'loginOrMail': username,
