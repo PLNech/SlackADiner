@@ -40,9 +40,12 @@ def get_meals():
             quantity = int(meal_select.find_all("option")[-1].get_text())
             meal_diner_div = meal_select.parent.parent.parent
             meal_diner = meal_diner_div.find("h3").get_text().strip()
-            spellcheck = did_you_mean(meal_diner)
-            if spellcheck.lower() != meal_diner.lower():
-                meal_diner = spellcheck
+            try:
+                spellcheck = did_you_mean(meal_diner)
+                if spellcheck.lower() != meal_diner.lower():
+                    meal_diner = spellcheck
+            except Exception as e:
+                print("Spellcheck failed:", e)
             print("Found available meal:", meal_diner)
             meals.append((meal_diner, translator.translate(meal_diner).text, quantity))
     return meals
