@@ -18,23 +18,27 @@ There is {number} left, hurry!""".format(fr=fr, en=en, number=number_str)
 
 
 def make_message(meals):
-    header = "Hi everyone :sir:\nToday you can eat:\n\n"
+    text = "Hi everyone :sir:\n"
 
-    text = header + "\n".join([format_meal(*m) for m in meals])
+    if len(meals):
+        text += "Today you can eat:\n\n"
+        text += "\n".join([format_meal(*m) for m in meals])
+        attachments = [
+            {
+                "fallback": "Grab the food at https://55-amsterdam.sohappy.work/index.cfm?e=zr&id=1968",
+                "actions": [
+                    {
+                        "type": "button",
+                        "text": "Grab the food 😋",
+                        "url": "https://55-amsterdam.sohappy.work/index.cfm?e=zr&id=1968",
+                    }
+                ],
+            }
+        ]
 
-    attachments = [
-        {
-            "fallback": "Grab the food at https://55-amsterdam.sohappy.work/index.cfm?e=zr&id=1968",
-            "actions": [
-                {
-                    "type": "button",
-                    "text": "Grab the food 😋",
-                    "url": "https://55-amsterdam.sohappy.work/index.cfm?e=zr&id=1968",
-                }
-            ],
-        }
-    ]
-
+    else:
+        text += "Currently no Prêt À Diner is available :okay_sad:"
+        attachments = None
     return text, attachments
 
 
