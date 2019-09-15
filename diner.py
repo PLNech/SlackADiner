@@ -15,9 +15,6 @@ url_new_order_post = url_base + "&e=zro"
 url_start_order = url_base + "&e=zro.start&d=%s" % str_date
 url_menu = url_base + "&e=zro.cr&crid=3"
 
-username = os.environ["SOHAPPY_USERNAME"]
-password = os.environ["SOHAPPY_PASSWORD"]
-
 
 def main():
     print("Meals:", get_meals())
@@ -79,8 +76,8 @@ def login(session):
     res_login = session.post('https://55-amsterdam.sohappy.work/',
                              params=(('e', 'main.connect'),),
                              data={
-                                 'loginOrMail': username,
-                                 'pwd': password,
+                                 'loginOrMail': os.environ["SOHAPPY_USERNAME"],
+                                 'pwd': os.environ["SOHAPPY_PASSWORD"],
                                  'isStayConnected': ''
                              })
     soup_login = make_soup(res_login)
