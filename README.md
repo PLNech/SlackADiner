@@ -11,7 +11,7 @@ A SlackBot to let you know what is up for pret-a-diner tonight!
   - Sogeres (sohappy@work account) credentials (`SOHAPPY_USERNAME` and `SOHAPPY_PASSWORD`)
   - SlackBot API token (`SLACK_API_TOKEN`)
   - Slack channel to post into (`SLACK_CHANNEL`)
-- python3
+- Python3.6+
 - set up Heroku scheduling for when the menu will be available (around 2.30, 3PM should be safe)
 
 ## Plans
