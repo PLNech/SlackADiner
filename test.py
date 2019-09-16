@@ -1,6 +1,7 @@
 import unittest
 from datetime import date
 
+from diner import with_missing_accents
 from slackbot import SlackBot
 
 mock_meal = ("Aubergines sautées", "sautéed eggplants", 10)
@@ -41,3 +42,13 @@ class SlackBotTestCase(unittest.TestCase):
         self.assertTrue(fr in text, "The text should contain the french meal")
         self.assertTrue(en in text, "The text should contain the english meal")
         self.assertTrue(str(q) in text, "The text should contain the quantity")
+
+
+class DinerTestCase(unittest.TestCase):
+    """ Tests for the diner scraper. """
+
+    def test_with_missing_accents(self):
+        self.assertEqual(with_missing_accents("porc saute"), "porc sauté")
+        self.assertEqual(with_missing_accents("sauterelle"), "sauterelle")
+        self.assertEqual(with_missing_accents("Roti braise"), "Roti braisé")
+        self.assertEqual(with_missing_accents("Roti braise aux patates sautees"), "Roti braisé aux patates sautées")

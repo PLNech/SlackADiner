@@ -1,11 +1,13 @@
 #! /usr/bin/env python
 
 import os
+import re
 from datetime import date
 
 import googletrans
 import requests
 from bs4 import BeautifulSoup
+
 from didyoumean3.didyoumean import did_you_mean
 
 str_date = date.today().strftime("%d-%m-%Y")
@@ -18,6 +20,22 @@ url_menu = url_base + "&e=zro.cr&crid=3"
 
 def main():
     print("Meals:", get_meals())
+
+
+def with_missing_accents(meal_name: str):
+    accented_words = ["sauté", "braisé", "grillé", "doré", "flambé", "glacé", "poché"]
+    accented_words += [word + "e" for word in accented_words]
+    accented_words += [word + "s" for word in accented_words]
+
+    print("words: ", accented_words)
+
+    for word in accented_words:
+        unaccented_word = word.replace("é", "e")
+        match = re.search(r"\b%s\b" % re.escape(unaccented_word), meal_name)
+        if match is not None:
+            meal_name = meal_name.replace(unaccented_word, word)
+            print("Replacing ", word)
+    return meal_name
 
 
 def get_meals():
@@ -37,6 +55,7 @@ def get_meals():
             quantity = int(meal_select.find_all("option")[-1].get_text())
             meal_diner_div = meal_select.parent.parent.parent
             meal_diner = meal_diner_div.find("h3").get_text().strip()
+            meal_diner = with_missing_accents(meal_diner)
             try:
                 spellcheck = did_you_mean(meal_diner)
                 if spellcheck.lower() != meal_diner.lower():
