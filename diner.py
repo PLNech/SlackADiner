@@ -34,7 +34,6 @@ def with_missing_accents(meal_name: str):
         match = re.search(r"\b%s\b" % re.escape(unaccented_word), meal_name)
         if match is not None:
             meal_name = meal_name.replace(unaccented_word, word)
-            print("Replacing ", word)
     return meal_name
 
 
