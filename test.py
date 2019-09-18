@@ -38,9 +38,9 @@ class SlackBotTestCase(unittest.TestCase):
 
     def test_format_meal(self):
         (fr, en, q) = mock_meal
-        text = self.bot.format_meal(fr, en, q)
-        self.assertTrue(fr in text, "The text should contain the french meal")
-        self.assertTrue(en in text, "The text should contain the english meal")
+        text = self.bot.format_dish(fr, en, q)
+        self.assertTrue(fr in text, "The text should contain the french dish")
+        self.assertTrue(en in text, "The text should contain the english dish")
         self.assertTrue(str(q) in text, "The text should contain the quantity")
 
 
