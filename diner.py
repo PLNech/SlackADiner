@@ -27,8 +27,6 @@ def with_missing_accents(meal_name: str):
     accented_words += [word + "e" for word in accented_words]
     accented_words += [word + "s" for word in accented_words]
 
-    print("words: ", accented_words)
-
     for word in accented_words:
         unaccented_word = word.replace("é", "e")
         match = re.search(r"\b%s\b" % re.escape(unaccented_word), meal_name)
