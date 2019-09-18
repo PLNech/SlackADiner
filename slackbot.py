@@ -29,7 +29,7 @@ class SlackBot:
             attachments=attachments,
         )
         print("message sent!")
-        return response
+        return self.response
 
     def update_diner(self, channel_id, ts):
         # TODO: Test scheduling an update
@@ -58,7 +58,7 @@ class SlackBot:
                 text += "\n".join([SlackBot.format_dish(*m) for m in menu.meals])
             if len(menu.deserts):
                 text += SlackBot.format_one_or_some(menu.deserts, "desert")
-                text += "\n".join([SlackBot.format_dish(*m) for m in menu.meals])
+                text += "\n".join([SlackBot.format_dish(*m) for m in menu.deserts])
 
             attachments = [
                 {
