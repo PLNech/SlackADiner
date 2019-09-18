@@ -55,9 +55,9 @@ class SlackBot:
             if len(menu.meals):
                 text += SlackBot.format_one_or_some(menu.meals, "meal")
                 text += "\n".join([SlackBot.format_dish(*m) for m in menu.meals])
-            if len(menu.deserts):
-                text += SlackBot.format_one_or_some(menu.deserts, "desert")
-                text += "\n".join([SlackBot.format_dish(*m) for m in menu.deserts])
+            if len(menu.desserts):
+                text += SlackBot.format_one_or_some(menu.desserts, "dessert")
+                text += "\n".join([SlackBot.format_dish(*m) for m in menu.desserts])
 
             attachments = [
                 {

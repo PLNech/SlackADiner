@@ -18,7 +18,7 @@ url_new_order_post = url_base + "&e=zro"
 url_start_order = url_base + "&e=zro.start&d=%s" % str_date
 url_menu = url_base + "&e=zro.cr"
 url_menu_meals = url_menu + "&crid=3"
-url_menu_deserts = url_menu + "&crid=7"
+url_menu_desserts = url_menu + "&crid=7"
 
 
 def main():
@@ -46,7 +46,7 @@ def get_dishes() -> Menu:
         reset_session(session)
         start_new_command(session)
 
-        for category, url in [("meals", url_menu_meals), ("deserts", url_menu_deserts)]:
+        for category, url in [("meals", url_menu_meals), ("desserts", url_menu_desserts)]:
             print("Looking for %s..." % category)
 
             res = session.get(url)  # Get menu
