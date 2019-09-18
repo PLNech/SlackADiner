@@ -49,10 +49,9 @@ class SlackBot:
 
     @staticmethod
     def make_message(menu: Menu):
-        text = "Hi everyone :sir:\n"
+        text = "Hi everyone, here's today's _Prêt à dîner_ menu :sir:\n"
 
         if menu.has_food:
-            text += "Today you can eat:\n\n"
             if len(menu.meals):
                 text += SlackBot.format_one_or_some(menu.meals, "meal")
                 text += "\n".join([SlackBot.format_dish(*m) for m in menu.meals])
@@ -80,7 +79,7 @@ class SlackBot:
 
     @staticmethod
     def format_one_or_some(dishes, name):
-        return ("Some %ss" % name if len(dishes) > 1 else "A %s" % name) + ":"
+        return "\n" + ("Some %ss" % name if len(dishes) > 1 else "A %s" % name) + ":\n"
 
     @staticmethod
     def is_canteen_day(day=date.today()):
