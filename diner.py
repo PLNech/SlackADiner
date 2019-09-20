@@ -66,7 +66,7 @@ def get_dishes() -> Menu:
                 except Exception as e:
                     print("Spellcheck failed:", e)
                 print("Found available dish:", dish_diner)
-                menu[category].append((dish_diner, translator.translate(dish_diner).text, quantity))
+                menu[category].append((dish_diner, translator.translate(dish_diner, src="fr").text, quantity))
     return menu
 
 

@@ -1,6 +1,7 @@
 import unittest
 from datetime import date
 
+from didyoumean3.didyoumean import did_you_mean
 from diner import with_missing_accents
 from slackbot import SlackBot
 
@@ -42,6 +43,14 @@ class SlackBotTestCase(unittest.TestCase):
         self.assertTrue(fr in text, "The text should contain the french dish")
         self.assertTrue(en in text, "The text should contain the english dish")
         self.assertTrue(str(q) in text, "The text should contain the quantity")
+
+    def test_spellcheck_when_translation(self):
+        query = "Focacia d'aubergine,légumes grillés et mayonnaise aubergines"
+        actual = did_you_mean(query)
+
+        self.assertFalse("Showing translation for" in actual)
+        self.assertFalse("Translate instead" in actual)
+        print(actual)
 
 
 class DinerTestCase(unittest.TestCase):
