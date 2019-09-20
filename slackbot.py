@@ -23,8 +23,7 @@ class SlackBot:
     def send_diner(self):
         text, attachments = SlackBot.make_message(get_dishes())
         self.response = self.client.chat_postMessage(
-            channel=os.environ['SLACK_CHANNEL'],
-            # channel="#office-paris-lunch",
+            channel=os.environ['SLACK_CHANNEL'] if "SLACK_CHANNEL" in os.environ else "#test",
             text=text,
             attachments=attachments,
         )
