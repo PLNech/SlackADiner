@@ -26,7 +26,7 @@ def main():
 
 
 def with_missing_accents(course_name: str):
-    accented_words = ["sauté", "braisé", "grillé", "doré", "flambé", "glacé", "poché"]
+    accented_words = ["sauté", "braisé", "grillé", "doré", "flambé", "glacé", "poché", "haché"]
     accented_words += [word + "e" for word in accented_words]
     accented_words += [word + "s" for word in accented_words]
 
