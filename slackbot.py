@@ -51,7 +51,14 @@ class SlackBot:
         )
 
     @staticmethod
-    def format_dish(fr, en, quantity=None):
+    def format_dish(fr: str, en: str, quantity: int = None) -> dict:
+        """Formats the dish as an attachment' field.
+
+        :param fr: Its french name.
+        :param en: Its english name.
+        :param quantity: When specified, how many dishes are available.
+        """
+
         if quantity is not None:
             plural = quantity >= 2
             fr = fr + """

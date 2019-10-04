@@ -40,10 +40,11 @@ class SlackBotTestCase(unittest.TestCase):
 
     def test_format_meal(self):
         (fr, en, q) = mock_meal
-        text = self.bot.format_dish(fr, en, q)
-        self.assertTrue(fr in text, "The text should contain the french dish")
-        self.assertTrue(en in text, "The text should contain the english dish")
-        self.assertTrue(str(q) in text, "The text should contain the quantity")
+        field = self.bot.format_dish(fr, en, q)
+        self.assertTrue(fr in str(field), "The text should contain the french dish")
+        self.assertTrue(en in str(field), "The text should contain the english dish")
+        if q is not None:
+            self.assertTrue(str(q) in str(field), "The text should contain the quantity")
 
     def test_spellcheck_when_translation(self):
         query = "Focacia d'aubergine,légumes grillés et mayonnaise aubergines"
