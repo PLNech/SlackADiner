@@ -2,7 +2,7 @@ import unittest
 from datetime import date
 
 from didyoumean3.didyoumean import did_you_mean
-from diner import with_missing_accents
+from scraper import with_missing_accents
 from slackbot import SlackBot
 
 mock_meal = ("Aubergines sautées", "sautéed eggplants", 10)

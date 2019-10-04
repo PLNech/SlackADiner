@@ -4,8 +4,8 @@ from datetime import date
 
 import slack
 
-from diner import get_dishes
-from menu import Menu
+from scraper import get_diner
+from menu import Diner
 
 
 class SlackBot:
@@ -21,7 +21,7 @@ class SlackBot:
         return self._client
 
     def send_diner(self):
-        text, attachments = SlackBot.make_message(get_dishes())
+        text, attachments = SlackBot.make_message(get_diner())
         self.response = self.client.chat_postMessage(
             channel=os.environ['SLACK_CHANNEL'] if "SLACK_CHANNEL" in os.environ else "#test",
             text=text,
@@ -32,7 +32,7 @@ class SlackBot:
 
     def update_diner(self, channel_id, ts):
         # TODO: Test scheduling an update
-        text, attachments = SlackBot.make_message(*get_dishes())
+        text, attachments = SlackBot.make_message(*get_diner())
         self.client.chat_update(
             channel=channel_id,
             ts=ts,
@@ -47,7 +47,7 @@ class SlackBot:
         There is {number} left, hurry!""".format(fr=fr, en=en, number=number_str)
 
     @staticmethod
-    def make_message(menu: Menu):
+    def make_message(menu: Diner):
         text = "Hi everyone, here's today's _Prêt à dîner_ menu :sir:\n"
 
         if menu.has_food:
