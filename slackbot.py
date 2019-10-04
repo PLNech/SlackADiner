@@ -52,29 +52,45 @@ class SlackBot:
 
     @staticmethod
     def format_dish(fr, en, quantity=None):
-        text = "• *{en}* (_{fr}_ :cow:)".format(fr=fr, en=en)
         if quantity is not None:
-            text = text + """
-        There is {number} left, hurry!""".format(number=str(quantity) if quantity > 2 else "*only one*")
-        return text
+            plural = quantity >= 2
+            fr = fr + """
+        There {verb} {number} left, hurry!""".format(verb="are" if plural else "is",
+                                                     number=quantity if plural else "*only one*")
+
+        return {
+            "title": ":flag-us: %s" % en,
+            "value": ":flag-fr: %s" % fr,
+            "short": False
+        }
 
     @staticmethod
     def make_message(menu: Menu):
-
-        title = "_Prêt à dîner_" if menu is Diner else "Lunch"
+        colors = {"starter": "#1B9135", "meal": "#186876", "side": "#C07024", "dessert": "#C03324"}
+        is_diner = type(menu) is Diner
+        title = "_Prêt à dîner_" if is_diner else "Lunch"
         text = "Hi everyone, here's today's %s menu :sir:\n" % title
 
         if menu.has_food:
-            for composante, name in [(menu.entrees, "starter"), (menu.plats, "meal"), (menu.garnitures, "side"),
-                                     (menu.desserts, "dessert")]:
-                print("handling composante %s: " % name, composante)
-                print([len(i) for i in composante])
+            attachments = []
+            # Let's show meals first, then deserts and starters, ignoring sides
+            for composante, name in [(menu.plats, "meal"), (menu.desserts, "dessert"), (menu.entrees, "starter")]:
                 if len(composante):
-                    text += SlackBot.format_one_or_some(composante, name)
-                    text += "\n".join([SlackBot.format_dish(*m) for m in composante])
+                    dishes = [SlackBot.format_dish(fr, en, quantity) for fr, en, quantity in composante]
+                    dishes_title = SlackBot.format_one_or_some(composante, name)
+                    dishes_string = dishes_title + str(composante)
 
-            attachments = [
-                {
+                    attachments.append({
+                        "fallback": dishes_string,
+                        "color": colors[name],
+                        "title": dishes_title,
+                        "fields": dishes,
+                        "mrkdwn_in": [
+                            "fields"
+                        ]
+                    })
+            if is_diner:
+                attachments.append({  # Add the CTA
                     "fallback": "Grab the food at https://55-amsterdam.sohappy.work/index.cfm?e=zr&id=1968",
                     "actions": [
                         {
@@ -83,9 +99,7 @@ class SlackBot:
                             "url": "https://55-amsterdam.sohappy.work/index.cfm?e=zr&id=1968",
                         }
                     ],
-                }
-            ]
-
+                })
         else:
             text += "Currently no %s is available :okay_sad:" % title
             attachments = None
