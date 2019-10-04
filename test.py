@@ -57,7 +57,8 @@ class DinerTestCase(unittest.TestCase):
     """ Tests for the diner scraper. """
 
     def test_with_missing_accents(self):
-        self.assertEqual(with_missing_accents("porc saute"), "porc sauté")
-        self.assertEqual(with_missing_accents("sauterelle"), "sauterelle")
-        self.assertEqual(with_missing_accents("Roti braise"), "Roti braisé")
-        self.assertEqual(with_missing_accents("Roti braise aux patates sautees"), "Roti braisé aux patates sautées")
+        self.assertEqual("porc sauté", with_missing_accents("porc saute"))
+        self.assertEqual("sauterelle", with_missing_accents("sauterelle"))
+        self.assertEqual("Roti braisé", with_missing_accents("Roti braise"))
+        self.assertEqual("Roti braisé aux patates sautées", with_missing_accents("Roti braise aux patates sautees"))
+        self.assertEqual("Steak à la fleur de sel", with_missing_accents("Steak a la fleur de sel"))

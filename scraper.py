@@ -28,16 +28,17 @@ url_lunch = url_base % id_lunch + "&e=zr"
 
 
 def main():
-    print(get_lunch())
+    print(get_diner())
 
 
 def with_missing_accents(course_name: str):
-    accented_words = ["sauté", "braisé", "grillé", "doré", "flambé", "glacé", "poché", "haché", "caramelisé"]
+    accented_words = ["sauté", "braisé", "grillé", "doré", "flambé", "glacé", "poché", "haché", "caramelisé", "praliné"]
     accented_words += [word + "e" for word in accented_words]
     accented_words += [word + "s" for word in accented_words]
+    accented_words.append("à la")
 
     for word in accented_words:
-        unaccented_word = word.replace("é", "e")
+        unaccented_word = word.replace("é", "e").replace("à", "a")
         match = re.search(r"\b%s\b" % re.escape(unaccented_word), course_name)
         if match is not None:
             course_name = course_name.replace(unaccented_word, word)
