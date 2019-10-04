@@ -3,6 +3,7 @@ from datetime import date
 
 from didyoumean3.didyoumean import did_you_mean
 from diner import with_missing_accents
+from menu import Menu
 from slackbot import SlackBot
 
 mock_meal = ("Aubergines sautées", "sautéed eggplants", 10)
@@ -31,10 +32,10 @@ class SlackBotTestCase(unittest.TestCase):
         self.assertTrue(self.bot.is_canteen_day(friday), "Canteen on fridays")
 
     def test_make_message(self):
-        text, attachments = self.bot.make_message([])
+        text, attachments = self.bot.make_message(Menu())
         self.assertIsNone(attachments, "Empty meals should have no attachments")
 
-        text, attachments = self.bot.make_message([mock_meal])
+        text, attachments = self.bot.make_message(Menu(meals=[mock_meal]))
         self.assertIsNotNone(attachments, "Meals should have some attachments")
 
     def test_format_meal(self):
