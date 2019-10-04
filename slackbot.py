@@ -4,8 +4,8 @@ from datetime import date
 
 import slack
 
-from scraper import get_diner
-from menu import Diner
+from menu import Diner, Menu
+from scraper import get_diner, get_lunch
 
 
 class SlackBot:
@@ -30,9 +30,19 @@ class SlackBot:
         print("message sent!")
         return self.response
 
+    def send_lunch(self):
+        text, attachments = SlackBot.make_message(get_lunch())
+        self.response = self.client.chat_postMessage(
+            channel=os.environ['SLACK_CHANNEL'] if "SLACK_CHANNEL" in os.environ else "#test",
+            text=text,
+            attachments=attachments,
+        )
+        print("message sent!")
+        return self.response
+
     def update_diner(self, channel_id, ts):
         # TODO: Test scheduling an update
-        text, attachments = SlackBot.make_message(*get_diner())
+        text, attachments = SlackBot.make_message(get_diner())
         self.client.chat_update(
             channel=channel_id,
             ts=ts,
@@ -41,22 +51,27 @@ class SlackBot:
         )
 
     @staticmethod
-    def format_dish(fr, en, quantity):
-        number_str = str(quantity) if quantity > 2 else "*only one*"
-        return """• *{en}* (_{fr}_ :cow:)
-        There is {number} left, hurry!""".format(fr=fr, en=en, number=number_str)
+    def format_dish(fr, en, quantity=None):
+        text = "• *{en}* (_{fr}_ :cow:)".format(fr=fr, en=en)
+        if quantity is not None:
+            text = text + """
+        There is {number} left, hurry!""".format(number=str(quantity) if quantity > 2 else "*only one*")
+        return text
 
     @staticmethod
-    def make_message(menu: Diner):
-        text = "Hi everyone, here's today's _Prêt à dîner_ menu :sir:\n"
+    def make_message(menu: Menu):
+
+        title = "_Prêt à dîner_" if menu is Diner else "Lunch"
+        text = "Hi everyone, here's today's %s menu :sir:\n" % title
 
         if menu.has_food:
-            if len(menu.meals):
-                text += SlackBot.format_one_or_some(menu.meals, "meal")
-                text += "\n".join([SlackBot.format_dish(*m) for m in menu.meals])
-            if len(menu.desserts):
-                text += SlackBot.format_one_or_some(menu.desserts, "dessert")
-                text += "\n".join([SlackBot.format_dish(*m) for m in menu.desserts])
+            for composante, name in [(menu.entrees, "starter"), (menu.plats, "meal"), (menu.garnitures, "side"),
+                                     (menu.desserts, "dessert")]:
+                print("handling composante %s: " % name, composante)
+                print([len(i) for i in composante])
+                if len(composante):
+                    text += SlackBot.format_one_or_some(composante, name)
+                    text += "\n".join([SlackBot.format_dish(*m) for m in composante])
 
             attachments = [
                 {
@@ -72,13 +87,13 @@ class SlackBot:
             ]
 
         else:
-            text += "Currently no Prêt À Diner is available :okay_sad:"
+            text += "Currently no %s is available :okay_sad:" % title
             attachments = None
         return text, attachments
 
     @staticmethod
     def format_one_or_some(dishes, name):
-        return "\n" + ("Some %ss" % name if len(dishes) > 1 else "A %s" % name) + ":\n"
+        return "\n\n" + ("Some %ss" % name if len(dishes) > 1 else "A %s" % name) + ":\n"
 
     @staticmethod
     def is_canteen_day(day=date.today()):

@@ -19,10 +19,6 @@ class Menu(object):
             desserts = []
         self.desserts = desserts
 
-        if dessertbar is None:
-            dessertbar = []
-        self.dessertbar = dessertbar
-
     def __getitem__(self, key):
         key = unidecode.unidecode(key).lower().replace("'", "")
         if key == "entrees":
@@ -33,30 +29,32 @@ class Menu(object):
             return self.garnitures
         elif key == "desserts":
             return self.desserts
-        elif key == "dessertbar":
-            return self.dessertbar
+        elif key == "dessertbar":  # DISCUSS: should we separate desserts?
+            return self.desserts
         else:
             print("a Menu has no %s." % key)
             exit("-1")
 
     def __str__(self):
-        sep = ", "
-        return "Starters: %s\nMeals: %s\n Garnitures: %s\n Desserts: %s\n Dessert'Bar: %s." % \
-               (sep.join(self.entrees), sep.join(self.plats), sep.join(self.garnitures), sep.join(self.desserts),
-                sep.join(self.dessertbar))
+        return "Starters: %s\nMeals: %s\n Garnitures: %s\n Desserts: %s\n" % \
+               tuple(["; ".join(it) for it in self.composantes])
 
     @property
     def has_food(self):
-        return len(self.plats) or len(self.desserts)
+        return any(len(it) for it in self.composantes)
+
+    @property
+    def composantes(self):
+        return [self.entrees, self.plats, self.garnitures, self.desserts]
 
 
 class Diner(Menu):
     def __init__(self, plats=None, desserts=None):
         super().__init__(plats=plats, desserts=desserts)
 
+    @property
+    def composantes(self):
+        return [self.plats, self.desserts]
+
     def __str__(self):
         return "Meals: %s, desserts: %s." % (self.plats, self.desserts)
-
-    @property
-    def has_food(self):
-        return len(self.plats) or len(self.desserts)

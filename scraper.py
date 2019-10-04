@@ -46,6 +46,7 @@ def with_missing_accents(course_name: str):
 
 def get_lunch() -> Menu:
     menu = Menu()
+    translator = googletrans.Translator()
     with requests.Session() as session:
         reset_session(session)
 
@@ -54,10 +55,18 @@ def get_lunch() -> Menu:
         today = soup_lunch.find("div", {'data-is-today': True})
         composantes = today.find_all("div", {"class": "composante-recette"})
         for composante in composantes:
-            composante_name = composante.find("h3", {"class": "recette-title"}).get_text()
+            category = composante.find("h3", {"class": "recette-title"}).get_text()
             items = composante.find_all("li", {"class": "recette-item"})
             for item in items:
-                menu[composante_name].append(item.get_text().strip())
+                dish = item.get_text().strip()
+                try:
+                    spellcheck = did_you_mean(dish)
+                    if spellcheck.lower() != dish.lower():
+                        dish = spellcheck
+                except Exception as e:
+                    print("Spellcheck failed:", e)
+                print("Found available dish:", dish)
+                menu[category].append((dish, translator.translate(dish, src="fr").text, None))
     return menu
 
 
