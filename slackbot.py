@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 import os
-from datetime import date
+from datetime import date, datetime
 
 import slack
 
@@ -129,5 +129,5 @@ class SlackBot:
 if __name__ == "__main__":
     bot = SlackBot()
     if SlackBot.is_canteen_day():
-        response = bot.send_diner()
+        response = bot.send_lunch() if datetime.now().hour < 12 else bot.send_diner()
         print(response)  # this contains channel & ts, used for updating
