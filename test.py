@@ -2,7 +2,7 @@ import unittest
 from datetime import date
 
 from didyoumean3.didyoumean import did_you_mean
-from diner import with_missing_accents
+from scraper import with_missing_accents
 from menu import Menu
 from slackbot import SlackBot
 
@@ -35,15 +35,16 @@ class SlackBotTestCase(unittest.TestCase):
         text, attachments = self.bot.make_message(Menu())
         self.assertIsNone(attachments, "Empty meals should have no attachments")
 
-        text, attachments = self.bot.make_message(Menu(meals=[mock_meal]))
+        text, attachments = self.bot.make_message(Menu(plats=[mock_meal]))
         self.assertIsNotNone(attachments, "Meals should have some attachments")
 
     def test_format_meal(self):
         (fr, en, q) = mock_meal
-        text = self.bot.format_dish(fr, en, q)
-        self.assertTrue(fr in text, "The text should contain the french dish")
-        self.assertTrue(en in text, "The text should contain the english dish")
-        self.assertTrue(str(q) in text, "The text should contain the quantity")
+        field = self.bot.format_dish(fr, en, q)
+        self.assertTrue(fr in str(field), "The text should contain the french dish")
+        self.assertTrue(en in str(field), "The text should contain the english dish")
+        if q is not None:
+            self.assertTrue(str(q) in str(field), "The text should contain the quantity")
 
     def test_spellcheck_when_translation(self):
         query = "Focacia d'aubergine,légumes grillés et mayonnaise aubergines"

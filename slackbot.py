@@ -4,8 +4,8 @@ from datetime import date
 
 import slack
 
-from diner import get_dishes
-from menu import Menu
+from menu import Diner, Menu
+from scraper import get_diner, get_lunch
 
 
 class SlackBot:
@@ -21,7 +21,17 @@ class SlackBot:
         return self._client
 
     def send_diner(self):
-        text, attachments = SlackBot.make_message(get_dishes())
+        text, attachments = SlackBot.make_message(get_diner())
+        self.response = self.client.chat_postMessage(
+            channel=os.environ['SLACK_CHANNEL'] if "SLACK_CHANNEL" in os.environ else "#test",
+            text=text,
+            attachments=attachments,
+        )
+        print("message sent!")
+        return self.response
+
+    def send_lunch(self):
+        text, attachments = SlackBot.make_message(get_lunch())
         self.response = self.client.chat_postMessage(
             channel=os.environ['SLACK_CHANNEL'] if "SLACK_CHANNEL" in os.environ else "#test",
             text=text,
@@ -32,7 +42,7 @@ class SlackBot:
 
     def update_diner(self, channel_id, ts):
         # TODO: Test scheduling an update
-        text, attachments = SlackBot.make_message(*get_dishes())
+        text, attachments = SlackBot.make_message(get_diner())
         self.client.chat_update(
             channel=channel_id,
             ts=ts,
@@ -41,25 +51,53 @@ class SlackBot:
         )
 
     @staticmethod
-    def format_dish(fr, en, quantity):
-        number_str = str(quantity) if quantity > 2 else "*only one*"
-        return """• *{en}* (_{fr}_ :cow:)
-        There is {number} left, hurry!""".format(fr=fr, en=en, number=number_str)
+    def format_dish(fr: str, en: str, quantity: int = None) -> dict:
+        """Formats the dish as an attachment' field.
+
+        :param fr: Its french name.
+        :param en: Its english name.
+        :param quantity: When specified, how many dishes are available.
+        """
+
+        if quantity is not None:
+            plural = quantity >= 2
+            fr = fr + """
+        There {verb} {number} left, hurry!""".format(verb="are" if plural else "is",
+                                                     number=quantity if plural else "*only one*")
+
+        return {
+            "title": ":flag-us: %s" % en,
+            "value": ":flag-fr: %s" % fr,
+            "short": False
+        }
 
     @staticmethod
     def make_message(menu: Menu):
-        text = "Hi everyone, here's today's _Prêt à dîner_ menu :sir:\n"
+        colors = {"starter": "#1B9135", "meal": "#186876", "side": "#C07024", "dessert": "#C03324"}
+        is_diner = type(menu) is Diner
+        title = "_Prêt à dîner_" if is_diner else "Lunch"
+        text = "Hi everyone, here's today's %s menu :sir:\n" % title
 
         if menu.has_food:
-            if len(menu.meals):
-                text += SlackBot.format_one_or_some(menu.meals, "meal")
-                text += "\n".join([SlackBot.format_dish(*m) for m in menu.meals])
-            if len(menu.desserts):
-                text += SlackBot.format_one_or_some(menu.desserts, "dessert")
-                text += "\n".join([SlackBot.format_dish(*m) for m in menu.desserts])
+            attachments = []
+            # Let's show meals first, then deserts and starters, ignoring sides
+            for composante, name in [(menu.plats, "meal"), (menu.desserts, "dessert"), (menu.entrees, "starter")]:
+                if len(composante):
+                    dishes = [SlackBot.format_dish(fr, en, quantity) for fr, en, quantity in composante]
+                    dishes_title = SlackBot.format_one_or_some(composante, name)
+                    dishes_string = dishes_title + str(composante)
 
-            attachments = [
-                {
+                    attachments.append({
+                        "fallback": dishes_string,
+                        "color": colors[name],
+                        "title": dishes_title,
+                        "fields": dishes,
+                        "mrkdwn_in": [
+                            "fields"
+                        ]
+                    })
+            if is_diner:
+                attachments.append({  # Add the CTA
                     "fallback": "Grab the food at https://55-amsterdam.sohappy.work/index.cfm?e=zr&id=1968",
                     "actions": [
                         {
@@ -68,17 +106,15 @@ class SlackBot:
                             "url": "https://55-amsterdam.sohappy.work/index.cfm?e=zr&id=1968",
                         }
                     ],
-                }
-            ]
-
+                })
         else:
-            text += "Currently no Prêt À Diner is available :okay_sad:"
+            text += "Currently no %s is available :okay_sad:" % title
             attachments = None
         return text, attachments
 
     @staticmethod
     def format_one_or_some(dishes, name):
-        return "\n" + ("Some %ss" % name if len(dishes) > 1 else "A %s" % name) + ":\n"
+        return "\n\n" + ("Some %ss" % name if len(dishes) > 1 else "A %s" % name) + ":\n"
 
     @staticmethod
     def is_canteen_day(day=date.today()):

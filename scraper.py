@@ -9,44 +9,77 @@ import requests
 from bs4 import BeautifulSoup
 
 from didyoumean3.didyoumean import did_you_mean
-from menu import Menu
+from menu import Diner, Menu
 
+id_lunch = 930
+id_diner = 1968
 str_date = date.today().strftime("%d-%m-%Y")
-url_base = "https://55-amsterdam.sohappy.work/?id=1968"
-url_new_order_get = url_base + "&e=zr"
-url_new_order_post = url_base + "&e=zro"
-url_start_order = url_base + "&e=zro.start&d=%s" % str_date
-url_menu = url_base + "&e=zro.cr"
-url_menu_meals = url_menu + "&crid=3"
-url_menu_desserts = url_menu + "&crid=7"
+url_base = "https://55-amsterdam.sohappy.work/?id=%i"
+url_diner = url_base % id_diner
+url_new_order_get = url_diner + "&e=zr"
+url_new_order_post = url_diner + "&e=zro"
+
+url_start_order = url_diner + "&e=zro.start&d=%s" % str_date
+url_diner_menu = url_new_order_post + ".cr"
+url_diner_meals = url_diner_menu + "&crid=3"
+url_diner_desserts = url_diner_menu + "&crid=7"
+
+url_lunch = url_base % id_lunch + "&e=zr"
 
 
 def main():
-    print("Meals:", get_dishes())
+    print(get_diner())
 
 
 def with_missing_accents(course_name: str):
-    accented_words = ["sauté", "braisé", "grillé", "doré", "flambé", "glacé", "poché", "haché"]
+    accented_words = ["sauté", "braisé", "grillé", "doré", "flambé", "glacé", "poché", "haché", "caramelisé", "praliné"]
     accented_words += [word + "e" for word in accented_words]
     accented_words += [word + "s" for word in accented_words]
+    accented_words.append("à la")
 
     for word in accented_words:
-        unaccented_word = word.replace("é", "e")
+        unaccented_word = word.replace("é", "e").replace("à", "a")
         match = re.search(r"\b%s\b" % re.escape(unaccented_word), course_name)
         if match is not None:
             course_name = course_name.replace(unaccented_word, word)
     return course_name
 
 
-def get_dishes() -> Menu:
+def get_lunch() -> Menu:
     menu = Menu()
+    translator = googletrans.Translator()
+    with requests.Session() as session:
+        reset_session(session)
+
+        res = session.get(url_lunch)
+        soup_lunch = make_soup(res)
+        today = soup_lunch.find("div", {'data-is-today': True})
+        composantes = today.find_all("div", {"class": "composante-recette"})
+        for composante in composantes:
+            category = composante.find("h3", {"class": "recette-title"}).get_text()
+            items = composante.find_all("li", {"class": "recette-item"})
+            for item in items:
+                dish = item.get_text().strip()
+                try:
+                    spellcheck = did_you_mean(dish)
+                    if spellcheck.lower() != dish.lower():
+                        dish = spellcheck
+                except Exception as e:
+                    print("Spellcheck failed:", e)
+                print("Found available dish:", dish)
+                menu[category].append((dish, translator.translate(dish, src="fr").text, None))
+    return menu
+
+
+def get_diner() -> Diner:
+    menu = Diner()
     translator = googletrans.Translator()
 
     with requests.Session() as session:
         reset_session(session)
         start_new_command(session)
 
-        for category, url in [("meals", url_menu_meals), ("desserts", url_menu_desserts)]:
+        for category, url in [("plats", url_diner_meals), ("desserts", url_diner_desserts)]:
             print("Looking for %s..." % category)
 
             res = session.get(url)  # Get menu
@@ -71,14 +104,14 @@ def get_dishes() -> Menu:
 
 
 def start_new_command(session):
-    # Start new command
+    """ Triggers the necessary requests to see available dishes. """
     session.get(url_new_order_get)
     session.post(url_new_order_post)
     session.post(url_start_order)
 
 
 def reset_session(session):
-    # Reset session
+    """ Resets the current session by logging-out and in again."""
     logout(session)
     login(session)
 
