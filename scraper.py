@@ -95,7 +95,11 @@ def get_diner() -> Diner:
                 try:
                     spellcheck = did_you_mean(dish_diner)
                     if spellcheck.lower() != dish_diner.lower():
+                        print("Spellchecked: %s -> %s" % (dish_diner, spellcheck))
                         dish_diner = spellcheck
+                    else:
+                        print("Spellcheck valid (%s)" % dish_diner)
+
                 except Exception as e:
                     print("Spellcheck failed:", e)
                 print("Found available dish:", dish_diner)
