@@ -31,7 +31,11 @@ def main():
     print(get_diner())
 
 
-def with_missing_accents(course_name: str):
+def sanitize(course_name: str):
+    # Space normalization
+    course_name = " ".join(course_name.split())
+
+    # Missing accents
     accented_words = ["sauté", "braisé", "grillé", "doré", "flambé", "glacé", "poché", "haché", "caramelisé", "praliné"]
     accented_words += [word + "e" for word in accented_words]
     accented_words += [word + "s" for word in accented_words]
@@ -91,7 +95,7 @@ def get_diner() -> Diner:
                 quantity = int(dish_select.find_all("option")[-1].get_text())
                 dish_diner_div = dish_select.parent.parent.parent
                 dish_diner = dish_diner_div.find("h3").get_text().strip()
-                dish_diner = with_missing_accents(dish_diner)
+                dish_diner = sanitize(dish_diner)
                 try:
                     spellcheck = did_you_mean(dish_diner)
                     if spellcheck.lower() != dish_diner.lower():

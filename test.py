@@ -2,7 +2,7 @@ import unittest
 from datetime import date
 
 from didyoumean3.didyoumean import did_you_mean
-from scraper import with_missing_accents
+from scraper import sanitize
 from menu import Menu
 from slackbot import SlackBot
 
@@ -59,7 +59,9 @@ class DinerTestCase(unittest.TestCase):
     """ Tests for the diner scraper. """
 
     def test_with_missing_accents(self):
-        self.assertEqual(with_missing_accents("porc saute"), "porc sauté")
-        self.assertEqual(with_missing_accents("sauterelle"), "sauterelle")
-        self.assertEqual(with_missing_accents("Roti braise"), "Roti braisé")
-        self.assertEqual(with_missing_accents("Roti braise aux patates sautees"), "Roti braisé aux patates sautées")
+        self.assertEqual(sanitize("porc saute"), "porc sauté")
+        self.assertEqual(sanitize("porc  aux   chanterelles"), "porc aux chanterelles")
+        self.assertEqual(sanitize("sauterelle"), "sauterelle")
+        self.assertEqual(sanitize("Steak hache  grille"), "Steak haché grillé")
+        self.assertEqual(sanitize("Roti braise"), "Roti braisé")
+        self.assertEqual(sanitize("Roti braise aux patates sautees"), "Roti braisé aux patates sautées")
