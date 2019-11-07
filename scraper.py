@@ -3,6 +3,7 @@
 import os
 import re
 from datetime import date
+from pprint import pprint
 
 import googletrans
 import requests
@@ -28,7 +29,8 @@ url_lunch = url_base % id_lunch + "&e=zr"
 
 
 def main():
-    print(get_diner())
+    for composante in get_lunch().composantes:
+        pprint(composante)
 
 
 def sanitize(course_name: str):
@@ -36,7 +38,8 @@ def sanitize(course_name: str):
     course_name = " ".join(course_name.split())
 
     # Missing accents
-    accented_words = ["sauté", "braisé", "grillé", "doré", "flambé", "glacé", "poché", "haché", "caramelisé", "praliné"]
+    accented_words = ["sauté", "braisé", "grillé", "doré", "flambé", "glacé", "poché", "haché", "caramelisé", "praliné",
+                      "aillé"]
     accented_words += [word + "e" for word in accented_words]
     accented_words += [word + "s" for word in accented_words]
     accented_words.append("à la")
@@ -64,13 +67,7 @@ def get_lunch() -> Menu:
             items = composante.find_all("li", {"class": "recette-item"})
             for item in items:
                 dish = item.get_text().strip()
-                try:
-                    spellcheck = did_you_mean(dish)
-                    if spellcheck.lower() != dish.lower():
-                        dish = spellcheck
-                except Exception as e:
-                    print("Spellcheck failed:", e)
-                print("Found available dish:", dish)
+                dish = sanitize_and_spellcheck(dish)
                 menu[category].append((dish, translator.translate(dish, src="fr").text, None))
     return menu
 
@@ -95,20 +92,27 @@ def get_diner() -> Diner:
                 quantity = int(dish_select.find_all("option")[-1].get_text())
                 dish_diner_div = dish_select.parent.parent.parent
                 dish_diner = dish_diner_div.find("h3").get_text().strip()
-                dish_diner = sanitize(dish_diner)
-                try:
-                    spellcheck = did_you_mean(dish_diner)
-                    if spellcheck.lower() != dish_diner.lower():
-                        print("Spellchecked: %s -> %s" % (dish_diner, spellcheck))
-                        dish_diner = spellcheck
-                    else:
-                        print("Spellcheck valid (%s)" % dish_diner)
 
-                except Exception as e:
-                    print("Spellcheck failed:", e)
-                print("Found available dish:", dish_diner)
+                dish_diner = sanitize_and_spellcheck(dish_diner)
                 menu[category].append((dish_diner, translator.translate(dish_diner, src="fr").text, quantity))
     return menu
+
+
+def sanitize_and_spellcheck(dish_diner):
+    print("Input:", dish_diner)
+    dish_diner = sanitize(dish_diner)
+    print("Sanitized:", dish_diner)
+    try:
+        spellcheck = did_you_mean(dish_diner)
+        if spellcheck.lower() != dish_diner.lower():
+            print("Spellchecked: %s -> %s" % (dish_diner, spellcheck))
+            dish_diner = spellcheck
+        else:
+            print("Spellcheck valid (%s)" % dish_diner)
+
+    except Exception as e:
+        print("Spellcheck failed:", e)
+    return dish_diner
 
 
 def start_new_command(session):

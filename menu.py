@@ -37,7 +37,7 @@ class Menu(object):
 
     def __str__(self):
         return "Starters: %s\nMeals: %s\n Garnitures: %s\n Desserts: %s\n" % \
-               tuple(["; ".join(it) for it in self.composantes])
+               tuple(["; ".join(it) for it, _, _ in self.composantes])
 
     @property
     def has_food(self):
