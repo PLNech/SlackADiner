@@ -2,7 +2,7 @@ import unidecode as unidecode
 
 
 class Menu(object):
-    def __init__(self, entrees=None, plats=None, garnitures=None, desserts=None, dessertbar=None):
+    def __init__(self, entrees=None, plats=None, garnitures=None, desserts=None):
         if entrees is None:
             entrees = []
         self.entrees = entrees
